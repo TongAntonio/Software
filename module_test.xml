@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_test" default="compile.module.test">
+  <dirname property="module.test.basedir" file="${ant.file.module_test}"/>
+  
+  <property name="module.jdk.home.test" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.test" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.test" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.test" value="-encoding UTF-8 -source 1.5 -target 1.8.0_152-release ${compiler.args}"/>
+  
+  <property name="test.output.dir" value="${module.test.basedir}/target/classes"/>
+  <property name="test.testoutput.dir" value="${module.test.basedir}/target/test-classes"/>
+  
+  <path id="test.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="test.module.production.classpath">
+    <path refid="${module.jdk.classpath.test}"/>
+    <path refid="library.maven:_org.junit.jupiter:junit-jupiter-api:5.1.0.classpath"/>
+    <path refid="library.maven:_org.apiguardian:apiguardian-api:1.0.0.classpath"/>
+    <path refid="library.maven:_org.opentest4j:opentest4j:1.0.0.classpath"/>
+    <path refid="library.maven:_org.junit.platform:junit-platform-commons:1.1.0.classpath"/>
+  </path>
+  
+  <path id="test.runtime.production.module.classpath">
+    <pathelement location="${test.output.dir}"/>
+    <path refid="library.maven:_org.junit.jupiter:junit-jupiter-api:5.1.0.classpath"/>
+    <path refid="library.maven:_org.apiguardian:apiguardian-api:1.0.0.classpath"/>
+    <path refid="library.maven:_org.opentest4j:opentest4j:1.0.0.classpath"/>
+    <path refid="library.maven:_org.junit.platform:junit-platform-commons:1.1.0.classpath"/>
+  </path>
+  
+  <path id="test.module.classpath">
+    <path refid="${module.jdk.classpath.test}"/>
+    <pathelement location="${test.output.dir}"/>
+    <path refid="library.maven:_org.junit.jupiter:junit-jupiter-engine:5.1.0-m1.classpath"/>
+    <path refid="library.maven:_org.junit.platform:junit-platform-engine:1.1.0-m1.classpath"/>
+    <path refid="library.maven:_org.junit.jupiter:junit-jupiter-api:5.1.0.classpath"/>
+    <path refid="library.maven:_org.apiguardian:apiguardian-api:1.0.0.classpath"/>
+    <path refid="library.maven:_org.opentest4j:opentest4j:1.0.0.classpath"/>
+    <path refid="library.maven:_org.junit.platform:junit-platform-commons:1.1.0.classpath"/>
+  </path>
+  
+  <path id="test.runtime.module.classpath">
+    <pathelement location="${test.testoutput.dir}"/>
+    <pathelement location="${test.output.dir}"/>
+    <path refid="library.maven:_org.junit.jupiter:junit-jupiter-engine:5.1.0-m1.classpath"/>
+    <path refid="library.maven:_org.junit.platform:junit-platform-engine:1.1.0-m1.classpath"/>
+    <path refid="library.maven:_org.junit.jupiter:junit-jupiter-api:5.1.0.classpath"/>
+    <path refid="library.maven:_org.apiguardian:apiguardian-api:1.0.0.classpath"/>
+    <path refid="library.maven:_org.opentest4j:opentest4j:1.0.0.classpath"/>
+    <path refid="library.maven:_org.junit.platform:junit-platform-commons:1.1.0.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.test">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.test">
+    <patternset refid="excluded.from.module.test"/>
+  </patternset>
+  
+  <path id="test.module.sourcepath">
+    <dirset dir="${module.test.basedir}">
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  <path id="test.module.test.sourcepath">
+    <dirset dir="${module.test.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.test" depends="compile.module.test.production,compile.module.test.tests" description="Compile module Test"/>
+  
+  <target name="compile.module.test.production" depends="register.custom.compilers" description="Compile module Test; production classes">
+    <mkdir dir="${test.output.dir}"/>
+    <javac2 destdir="${test.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.test}/javac">
+      <compilerarg line="${compiler.args.test}"/>
+      <bootclasspath refid="test.module.bootclasspath"/>
+      <classpath refid="test.module.production.classpath"/>
+      <src refid="test.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.test"/>
+    </javac2>
+    
+    <copy todir="${test.output.dir}">
+      <fileset dir="${module.test.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.test.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.test.tests" depends="register.custom.compilers,compile.module.test.production" description="compile module Test; test classes" unless="skip.tests">
+    <mkdir dir="${test.testoutput.dir}"/>
+    <javac2 destdir="${test.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.test}/javac">
+      <compilerarg line="${compiler.args.test}"/>
+      <bootclasspath refid="test.module.bootclasspath"/>
+      <classpath refid="test.module.classpath"/>
+      <src refid="test.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.test"/>
+    </javac2>
+    
+    <copy todir="${test.testoutput.dir}">
+      <fileset dir="${module.test.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.test" description="cleanup module">
+    <delete dir="${test.output.dir}"/>
+    <delete dir="${test.testoutput.dir}"/>
+  </target>
+</project>
