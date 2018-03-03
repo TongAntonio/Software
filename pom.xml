@@ -4,44 +4,196 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>Test</groupId>
-    <artifactId>Test</artifactId>
+    <groupId>csku</groupId>
+    <artifactId>trianglejavacocotest</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+
+    <name>trianglejavacocotest</name>
+    <url>http://maven.apache.org</url>
     <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
-    <junit.version>5.1.0-M1</junit.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.9</java.version>
+        <junit.version>5.1.0-M1</junit.version>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter-api</artifactId>
             <version>5.1.0-M1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-           <groupId>org.junit.jupiter</groupId>
-           <artifactId>junit-jupiter-api</artifactId>
-           <version>RELEASE</version>
-       </dependency>
-   </dependencies>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.0.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.0.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>4.12.3</version>
+            <scope>test</scope>
+        </dependency>
 
 
-   <build>
-       <plugins>
-           <plugin>
-               <groupId>org.apache.maven.plugins</groupId>
-               <artifactId>maven-compiler-plugin</artifactId>
-               <version>2.3.2</version>
-               <configuration>
-                   <source>${java.version}</source>
-                   <target>${java.version}</target>
-               </configuration>
-           </plugin>
-       </plugins>
-   </build>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <finalName>trianglejavacocotest</finalName>
+
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.0.0-M4</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-engine</artifactId>
+                        <version>5.0.0-M4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <!-- DO NOT include log4j.properties file in your Jar -->
+                    <excludes>
+                        <exclude>**/log4j.properties</exclude>
+                    </excludes>
+                    <archive>
+                        <manifest>
+                            <!-- Jar file entry point -->
+                            <mainClass>model.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <!--  implementation is needed only for Maven 2  -->
+                                <rule implementation="org.jacoco.maven.RuleConfiguration">
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <!--  implementation is needed only for Maven 2  -->
+                                        <limit implementation="org.jacoco.report.check.Limit">
+                                            <counter>COMPLEXITY</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.60</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
 
 </project>
+        <!-- <?xml version="1.0" encoding="UTF-8"?>
+        <project xmlns="http://maven.apache.org/POM/4.0.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+            <modelVersion>4.0.0</modelVersion>
+
+            <groupId>Test</groupId>
+            <artifactId>Test</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <properties>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <java.version>1.8</java.version>
+            <junit.version>5.1.0-M1</junit.version>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.junit.jupiter</groupId>
+
+                    <artifactId>junit-jupiter-engine</artifactId>
+                    <version>5.1.0-M1</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                   <groupId>org.junit.jupiter</groupId>
+                   <artifactId>junit-jupiter-api</artifactId>
+                   <version>RELEASE</version>
+               </dependency>
+           </dependencies>
+
+
+           <build>
+               <plugins>
+                   <plugin>
+                       <groupId>org.apache.maven.plugins</groupId>
+                       <artifactId>maven-compiler-plugin</artifactId>
+                       <version>2.3.2</version>
+                       <configuration>
+                           <source>${java.version}</source>
+                           <target>${java.version}</target>
+                       </configuration>
+                   </plugin>
+               </plugins>
+           </build>
+
+        </project> -->
